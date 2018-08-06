@@ -10,6 +10,7 @@ addtion, etc as operations on the individual bits.
 -}
 module BinaryNumbers(
     BinaryNumber,
+    integerToBinary,
     stringToBinary,
     (|+|)
 ) where
@@ -32,11 +33,33 @@ charToBinary c
 -- A binary number is a sequence of digits
 data BinaryNumber = BinaryNumber [BinaryDigit]
 
+instance Num BinaryNumber where
+    fromInteger     = integerToBinary
+    negate          = undefined
+    abs             = undefined
+    (+)             = (|+|)
+    (-)             = undefined 
+    (*)             = undefined 
+    signum          = binarySignum
+
 -- Leading Zeros do not change the value of the number, so this funciton 
 -- can be used to remove them.
 normalize :: BinaryNumber -> BinaryNumber
-normalize (BinaryNumber digits) = BinaryNumber (dropWhile (==Zero) digits)
+normalize (BinaryNumber digits ) = BinaryNumber $ (dropWhile (==Zero) (init digits)) ++ [last digits]
 
+binarySignum :: BinaryNumber -> BinaryNumber
+binarySignum i =
+    let (BinaryNumber (d:rest)) = (normalize i)
+    in  BinaryNumber [d] 
+
+integerToDigits :: Integer -> [BinaryDigit]
+integerToDigits 0 = [Zero]
+integerToDigits i 
+    | mod i 2 == 0 = Zero : integerToDigits (quot i 2)
+    | otherwise = One : integerToDigits (quot i 2)
+
+integerToBinary :: Integer -> BinaryNumber
+integerToBinary  = normalize . BinaryNumber . reverse . integerToDigits 
 
 -- Convert a string to a binary number. Fails if the string contains any
 -- chars other than '1' opr '0'
