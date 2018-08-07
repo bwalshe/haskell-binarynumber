@@ -15,6 +15,8 @@ module BinaryNumbers(
     (|+|)
 ) where
 
+import Text.Read
+
 -- Binary digits are either One or Zero
 data BinaryDigit = One | Zero deriving (Eq)
 
@@ -36,11 +38,12 @@ data BinaryNumber = BinaryNumber [BinaryDigit]
 instance Num BinaryNumber where
     fromInteger     = integerToBinary
     negate          = undefined
-    abs             = undefined
+    abs             = id
     (+)             = (|+|)
-    (-)             = undefined 
+    (-)             = undefined
     (*)             = undefined 
     signum          = binarySignum
+
 
 -- Leading Zeros do not change the value of the number, so this funciton 
 -- can be used to remove them.
@@ -48,9 +51,9 @@ normalize :: BinaryNumber -> BinaryNumber
 normalize (BinaryNumber digits ) = BinaryNumber $ (dropWhile (==Zero) (init digits)) ++ [last digits]
 
 binarySignum :: BinaryNumber -> BinaryNumber
-binarySignum i =
-    let (BinaryNumber (d:rest)) = (normalize i)
-    in  BinaryNumber [d] 
+binarySignum (BinaryNumber digits) 
+    | elem One digits = BinaryNumber [One]
+    | otherwise = BinaryNumber [Zero]
 
 integerToDigits :: Integer -> [BinaryDigit]
 integerToDigits 0 = [Zero]
